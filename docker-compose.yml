@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  wordpress:
+    build: .
+    container_name: wordpress
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    depends_on:
+      - mysql
+    volumes:
+      - ./wordpress/:/var/www
+      - ./php/php.ini-development/:/usr/local/etc/php/php.ini-development
+      - ./php/php.ini-production/:/usr/local/etc/php/php.ini-production
+    ports:
+      - 1212:1215
+      - 8181:8181
+    command: php -S 0.0.0.0:8181
+    networks:
+      - wordpress-network
+
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    restart: unless-stopped
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=12345678Test
+      - MYSQL_ROOT_PASSWORD=12345678Test
+    networks:
+      - wordpress-network
+
+networks:
+  wordpress-network:
+    driver: bridge
